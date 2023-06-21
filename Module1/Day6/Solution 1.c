@@ -21,58 +21,45 @@ struct Student {
     float marks;
 };
 
-void parseString(char* input, struct Student* students, int size) {
-    char* token = strtok(input, " ");
+void parseString(const char* input, struct Student* students) {
     int i = 0;
+    char* token = strtok((char*)input, " ");
 
-    while (token != NULL && i < size) {
-        students[i].rollno = atoi(token);
+    while (token != NULL) {
+        switch (i) {
+            case 0:
+                students->rollno = atoi(token);
+                break;
+            case 1:
+                strncpy(students->name, token, sizeof(students->name) - 1);
+                students->name[sizeof(students->name) - 1] = '\0';
+                break;
+            case 2:
+                students->marks = atof(token);
+                break;
+            default:
+                break;
+        }
 
-        token = strtok(NULL, " ");
-        strcpy(students[i].name, token);
-
-        token = strtok(NULL, " ");
-        students[i].marks = atof(token);
-
-        token = strtok(NULL, " ");
         i++;
+        token = strtok(NULL, " ");
     }
 }
 
 int main() {
-    int size;
+    const char* input = "1001 Aron 100.00";
+    const int numStudents = 1;
+    struct Student students[numStudents];
 
-    printf("Enter the number of students: ");
-    scanf("%d", &size);
-    getchar(); 
+    parseString(input, students);
 
-    struct Student* students = (struct Student*)malloc(size * sizeof(struct Student));
-
-    if (students == NULL) {
-        printf("Memory allocation failed!\n");
-        return 1;  
-    }
-
-    char input[100];
-    printf("Enter the student details in the format 'rollno name marks':\n");
-
-    for (int i = 0; i < size; i++) {
-        fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = '\0';  
-
-        parseString(input, &students[i], size);
-    }
-
-    printf("\nStudent Data:\n");
-    for (int i = 0; i < size; i++) {
-        printf("Student %d:\n", i + 1);
-        printf("Roll Number: %d\n", students[i].rollno);
+    // Print the initialized structure
+    for (int i = 0; i < numStudents; i++) {
+        printf("Roll No: %d\n", students[i].rollno);
         printf("Name: %s\n", students[i].name);
         printf("Marks: %.2f\n", students[i].marks);
-        printf("\n");
     }
-
-    free(students);
 
     return 0;
 }
+
